@@ -15,6 +15,8 @@ public:
 	// Sets default values for this actor's properties
 	AFloater();
 
+	
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = " ActorMeshComponents ") // Создаём новый макрос для переменных/ссылок/указателей
 		UStaticMeshComponent * StaticMesh; // и собственно указатель типа UStaticMesh
 
@@ -38,6 +40,31 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = " Floater Variables ")
 		bool bInitializeFloaterLocations;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = " Floater Variables |  Rotation ")
+		bool bInitialRotation;
+
+	UPROPERTY(BlueprintReadWrite, EditInstanceOnly, Category = " Floater Variables ")
+		FVector InitialForce;
+	
+	UPROPERTY(BlueprintReadWrite, EditInstanceOnly, Category = " Floater Variables ")
+		FVector InitialTorque;
+
+private:
+
+	float RunningTime;
+
+	UPROPERTY(EditAnywhere, Category = " Floater Variables | Wave Parameters ")
+	float Amplitude;
+	UPROPERTY(EditAnywhere, Category = " Floater Variables | Wave Parameters ")
+	float TimeStretch;
+	
+
+	UPROPERTY(EditAnywhere, Category = " Floater Variables |  Rotation ")
+	float Pitch ;
+	UPROPERTY(EditAnywhere, Category = " Floater Variables |  Rotation ")
+	float Yaw ;
+	UPROPERTY(EditAnywhere, Category = " Floater Variables |  Rotation ")
+	float Roll;
 	
 
 protected:
