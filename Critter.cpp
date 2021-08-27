@@ -2,7 +2,7 @@
 
 
 #include "Critter.h"
-#include "Components/StaticMeshComponent.h" //gives an able to use 'StaticMeshComponent' here)
+#include "Components/SkeletalMeshComponent.h" //gives an able to use 'StaticMeshComponent' here)
 #include "Camera/CameraComponent.h"				 //gives an able to use 'CameraComponent' here)
 #include "Components/InputComponent.h"			 //gives an able to use 'InputComponent' here)
 
@@ -10,31 +10,33 @@
 ACritter::ACritter() // Constructor
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootCompponent"));
-	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT(" MeshComponent "));
+	MeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT(" MeshComponent "));
 	MeshComponent->SetupAttachment(GetRootComponent());
 
+	
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT(" Camera "));
 	Camera->SetupAttachment(GetRootComponent());
 	Camera->SetRelativeLocation(FVector(-300.f, 0.f, 300.f));
 	Camera->SetRelativeRotation(FRotator(-45.f, 0.f, 0.f));
-
-	AutoPossessPlayer = EAutoReceiveInput::Player1;
+	
+	AutoPossessPlayer = EAutoReceiveInput::Disabled;
 
 	CurrentVelocity = FVector(0.f);
 	MaxSpeed = 100.f;
 }
 
 // Called when the game starts or when spawned
-void ACritter::BeginPlay()
+ void ACritter::BeginPlay()
 {
 	Super::BeginPlay();
 	
-}
+} 
 
 // Called every frame
+ 
 void ACritter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -45,13 +47,14 @@ void ACritter::Tick(float DeltaTime)
 }
 
 // Called to bind functionality to input
+
 void ACritter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	PlayerInputComponent->BindAxis(TEXT("MoveForward/Backward"), this , &ACritter::MoveForwardBackward);
 	PlayerInputComponent->BindAxis(TEXT("MoveRight/Left"), this, &ACritter::MoveRightLeft);
-	PlayerInputComponent->BindAxis(TEXT("MoveJump"), this, &ACritter::MoveJump);
+	// PlayerInputComponent->BindAxis(TEXT("MoveJump"), this, &ACritter::MoveJump);
 }
 
 

@@ -79,5 +79,10 @@ private:
 	UFUNCTION()
 		void MoveJump(float input);
 
+	void PitchCamera(float AxisValue);
+	void YawCamera(float AxisValue);
+
+	FVector2D  CameraInput;
+
 //FVector CurrentVelocity;
 };

@@ -19,10 +19,11 @@ ACollider::ACollider()
 	PrimaryActorTick.bCanEverTick = true;
 
 	// Add 'SphereComponent' to the 'RootComponent'
-	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT(" RootComponent "));
+	//RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT(" RootComponent "));
 
 	SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT(" SphereComponent "));
-	SphereComponent->SetupAttachment(GetRootComponent());
+	//SphereComponent->SetupAttachment(GetRootComponent());
+	RootComponent = SphereComponent;
 	SphereComponent->InitSphereRadius(40.f);
 	// Set collision preset
 	SphereComponent->SetCollisionProfileName(TEXT(" Pawn "));
@@ -35,7 +36,7 @@ ACollider::ACollider()
 	if (MeshComponentAsset.Succeeded())
 	{
 		MeshComponent->SetStaticMesh(MeshComponentAsset.Object);
-		// Ajust default sphere due to carcass cphere
+		// Ajust default sphere due to carcass sphere
 		MeshComponent->SetRelativeLocation(FVector(0.f, 0.f, -40.f));
 		MeshComponent->SetWorldScale3D(FVector(0.8f, 0.8f, 0.8f));
 	}
@@ -56,11 +57,11 @@ ACollider::ACollider()
 		//Actually create a camera
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT(" Camera "));
 	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
-		
 
-
-	OurMovementComponent = CreateDefaultSubobject< UColliderMovementComponent>(TEXT(" OurMovementComponent "));
+	OurMovementComponent = CreateDefaultSubobject<UColliderMovementComponent>(TEXT(" OurMovementComponent "));
 	OurMovementComponent->UpdatedComponent = RootComponent;
+
+	CameraInput = FVector2D(0.f, 0.f);
 
 	// Set defaults fo get inputs to our 'Collider' 
 	AutoPossessPlayer = EAutoReceiveInput::Player0;	
@@ -78,7 +79,13 @@ ACollider::ACollider()
 	{
 		Super::Tick(DeltaTime);
 
-		
+		FRotator NewRotation = GetActorRotation();
+		NewRotation.Yaw += CameraInput.X;
+		SetActorRotation(NewRotation);
+
+		FRotator NewSpringArmRotation = SpringArm->GetComponentRotation();
+		NewSpringArmRotation.Pitch = FMath::Clamp(NewSpringArmRotation.Pitch += CameraInput.Y, -80.f, -15.f);
+		SpringArm->SetWorldRotation(NewSpringArmRotation);
 	}
 
 	// Called to bind functionality to input
@@ -86,9 +93,13 @@ ACollider::ACollider()
 	{
 		Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-		PlayerInputComponent->BindAxis(TEXT(" MoveForward/Backward "), this, &ACollider::MoveForwardBackward);
-		PlayerInputComponent->BindAxis(TEXT(" MoveRight/Left "), this, &ACollider::MoveRightLeft);
+		PlayerInputComponent->BindAxis(TEXT(" MoveForward"), this, &ACollider::MoveForwardBackward);
+		PlayerInputComponent->BindAxis(TEXT(" MoveRight"), this, &ACollider::MoveRightLeft);
 		//PlayerInputComponent->BindAxis(TEXT(" MoveJump "), this, &ACollider::MoveJump);
+
+		PlayerInputComponent->BindAxis(TEXT(" CameraPitch "), this, &ACollider::PitchCamera);
+		PlayerInputComponent->BindAxis(TEXT(" CameraYaw "), this, &ACollider::YawCamera);
+
 
 	}
 
@@ -124,5 +135,17 @@ ACollider::ACollider()
 			OurMovementComponent->AddInputVector(input * Jump);
 		}
 	}
+
+	void ACollider::YawCamera(float AxisValue)
+	{
+		CameraInput.X = AxisValue;
+	}
+
+	void ACollider::PitchCamera(float AxisValue)
+	{
+		CameraInput.Y = AxisValue;
+	}
+
+
 
 
